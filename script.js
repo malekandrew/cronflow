@@ -213,6 +213,119 @@ class NaturalLanguageParser {
 
     initializePatterns() {
         return [
+            // Yearly patterns
+            {
+                regex: /(?:once\s+a\s+year|annually|yearly)(?:\s+(?:on|in))?\s*(january|february|march|april|may|june|july|august|september|october|november|december)?\s*(\d+)?(?:st|nd|rd|th)?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const monthName = match[1];
+                    const day = match[2] ? parseInt(match[2]) : 1;
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    
+                    const monthMap = {
+                        'january': 1, 'february': 2, 'march': 3, 'april': 4,
+                        'may': 5, 'june': 6, 'july': 7, 'august': 8,
+                        'september': 9, 'october': 10, 'november': 11, 'december': 12
+                    };
+                    
+                    const month = monthName ? monthMap[monthName.toLowerCase()] : 1;
+                    return `${time.minute} ${time.hour} ${day} ${month} *`;
+                }
+            },
+            
+            // Monthly patterns - specific day
+            {
+                regex: /(?:on\s+the\s+)?(\d+)(?:st|nd|rd|th)\s+(?:day\s+)?of\s+(?:each|every)\s+month(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const day = parseInt(match[1]);
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} ${day} * *`;
+                }
+            },
+            {
+                regex: /(?:every|each)\s+month\s+on\s+(?:the\s+)?(\d+)(?:st|nd|rd|th)?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const day = parseInt(match[1]);
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} ${day} * *`;
+                }
+            },
+            
+            // Monthly patterns - generic
+            {
+                regex: /(?:once\s+a\s+month|monthly)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 1 * *`;
+                }
+            },
+            
+            // Start/End of month
+            {
+                regex: /(?:at\s+the\s+)?(?:start|beginning)\s+of\s+(?:each|every)\s+month(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 1 * *`;
+                }
+            },
+            {
+                regex: /(?:at\s+the\s+)?end\s+of\s+(?:each|every)\s+month(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 28-31 * *`;
+                }
+            },
+            
+            // Every X days/weeks/months
+            {
+                regex: /every\s+(\d+)\s+days?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const days = parseInt(match[1]);
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} */${days} * *`;
+                }
+            },
+            {
+                regex: /every\s+(\d+)\s+weeks?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    // Weekly pattern, run on Mondays (can't do exact week intervals in cron)
+                    return `${time.minute} ${time.hour} * * 1`;
+                }
+            },
+            {
+                regex: /every\s+(\d+)\s+months?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const months = parseInt(match[1]);
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 1 */${months} *`;
+                }
+            },
+            
+            // Quarterly
+            {
+                regex: /(?:every\s+)?quarter(?:ly)?(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 1 */3 *`;
+                }
+            },
+            
+            // Bi-weekly/Bi-monthly
+            {
+                regex: /(?:bi-?weekly|every\s+other\s+week)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} * * 1`;
+                }
+            },
+            {
+                regex: /(?:bi-?monthly|twice\s+a\s+month)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 0, minute: 0 };
+                    return `${time.minute} ${time.hour} 1,15 * *`;
+                }
+            },
+            
             // Multiple days with "and" or "," (must be before single day patterns)
             {
                 regex: /(?:on\s+)?(?:every\s+)?([a-z,\s]+(?:and|,)\s*[a-z]+)(?:\s+at\s+)?(.+)?/i,
@@ -515,7 +628,7 @@ class CronChecker {
             this.cronModeBtn.classList.remove('active');
             this.naturalInput.style.display = 'block';
             this.cronInput.style.display = 'none';
-            this.formatHint.textContent = 'Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"';
+            this.formatHint.textContent = 'Try: "once a month", "15th of each month", "quarterly", "every Monday at 3pm"';
             this.naturalInput.focus();
             
             // Clear and reset
@@ -573,7 +686,7 @@ class CronChecker {
             }
         } else {
             this.convertedCron.style.display = 'none';
-            this.showError('Could not understand that expression. Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"');
+            this.showError('Could not understand that expression. Try: "once a month", "15th of each month", "quarterly", "weekdays at 9am", "every Monday and Friday"');
             this.hideResults();
         }
     }
