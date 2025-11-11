@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cron Checker - Understand Your Cron Expressions</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-clock"></i>
+                <h1>Cron Checker</h1>
+            </div>
+            <p class="subtitle">Understand your cron expressions with real-time feedback</p>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="cronInput" 
+                        placeholder="Enter your cron expression (e.g., 0 9 * * 1-5)"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <div class="input-help">
+                        <span class="format-hint">Format: minute hour day month weekday</span>
+                        <button id="helpBtn" class="help-btn" title="Show help">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="explanation-card" id="explanationCard">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Explanation</h3>
+                    </div>
+                    <div class="explanation-content" id="explanationContent">
+                        <p class="placeholder-text">Enter a cron expression above to see its explanation</p>
+                    </div>
+                </div>
+
+                <div class="schedule-card" id="scheduleCard">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Next Executions</h3>
+                    </div>
+                    <div class="schedule-content" id="scheduleContent">
+                        <p class="placeholder-text">Schedule will appear here</p>
+                    </div>
+                </div>
+
+                <div class="breakdown-card" id="breakdownCard">
+                    <div class="card-header">
+                        <i class="fas fa-cogs"></i>
+                        <h3>Field Breakdown</h3>
+                    </div>
+                    <div class="breakdown-content" id="breakdownContent">
+                        <div class="field-grid">
+                            <div class="field-item">
+                                <span class="field-label">Minute</span>
+                                <span class="field-value" id="minuteField">-</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">Hour</span>
+                                <span class="field-value" id="hourField">-</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">Day</span>
+                                <span class="field-value" id="dayField">-</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">Month</span>
+                                <span class="field-value" id="monthField">-</span>
+                            </div>
+                            <div class="field-item">
+                                <span class="field-label">Weekday</span>
+                                <span class="field-value" id="weekdayField">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <div class="examples-section" id="examplesSection">
+                <h3>Common Examples</h3>
+                <div class="examples-grid">
+                    <button class="example-btn" data-cron="0 9 * * 1-5">
+                        <span class="example-cron">0 9 * * 1-5</span>
+                        <span class="example-desc">Every weekday at 9 AM</span>
+                    </button>
+                    <button class="example-btn" data-cron="0 */2 * * *">
+                        <span class="example-cron">0 */2 * * *</span>
+                        <span class="example-desc">Every 2 hours</span>
+                    </button>
+                    <button class="example-btn" data-cron="30 14 * * 0">
+                        <span class="example-cron">30 14 * * 0</span>
+                        <span class="example-desc">Sundays at 2:30 PM</span>
+                    </button>
+                    <button class="example-btn" data-cron="0 0 1 * *">
+                        <span class="example-cron">0 0 1 * *</span>
+                        <span class="example-desc">First day of every month</span>
+                    </button>
+                    <button class="example-btn" data-cron="*/15 * * * *">
+                        <span class="example-cron">*/15 * * * *</span>
+                        <span class="example-desc">Every 15 minutes</span>
+                    </button>
+                    <button class="example-btn" data-cron="0 0 * * 6,0">
+                        <span class="example-cron">0 0 * * 6,0</span>
+                        <span class="example-desc">Weekends at midnight</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <div class="help-modal" id="helpModal">
+            <div class="help-content">
+                <div class="help-header">
+                    <h3>Cron Expression Format</h3>
+                    <button id="closeHelp" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="help-body">
+                    <div class="format-table">
+                        <div class="format-row header">
+                            <span>Field</span>
+                            <span>Allowed Values</span>
+                            <span>Special Characters</span>
+                        </div>
+                        <div class="format-row">
+                            <span>Minute</span>
+                            <span>0-59</span>
+                            <span>* , - /</span>
+                        </div>
+                        <div class="format-row">
+                            <span>Hour</span>
+                            <span>0-23</span>
+                            <span>* , - /</span>
+                        </div>
+                        <div class="format-row">
+                            <span>Day</span>
+                            <span>1-31</span>
+                            <span>* , - /</span>
+                        </div>
+                        <div class="format-row">
+                            <span>Month</span>
+                            <span>1-12</span>
+                            <span>* , - /</span>
+                        </div>
+                        <div class="format-row">
+                            <span>Weekday</span>
+                            <span>0-6 (0=Sunday)</span>
+                            <span>* , - /</span>
+                        </div>
+                    </div>
+                    <div class="special-chars">
+                        <h4>Special Characters</h4>
+                        <ul>
+                            <li><strong>*</strong> - Any value</li>
+                            <li><strong>,</strong> - List separator</li>
+                            <li><strong>-</strong> - Range</li>
+                            <li><strong>/</strong> - Step values</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
