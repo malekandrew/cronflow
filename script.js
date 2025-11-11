@@ -1,4 +1,143 @@
 // Cron Checker JavaScript
+
+// Animated Background
+class AnimatedBackground {
+    constructor() {
+        this.canvas = document.getElementById('backgroundCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: null, y: null, radius: 150 };
+        this.particleCount = 80;
+        
+        this.init();
+    }
+
+    init() {
+        this.resizeCanvas();
+        this.createParticles();
+        this.setupEventListeners();
+        this.animate();
+    }
+
+    resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    setupEventListeners() {
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+            this.particles = [];
+            this.createParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseout', () => {
+            this.mouse.x = null;
+            this.mouse.y = null;
+        });
+    }
+
+    createParticles() {
+        for (let i = 0; i < this.particleCount; i++) {
+            const size = Math.random() * 3 + 1;
+            const x = Math.random() * this.canvas.width;
+            const y = Math.random() * this.canvas.height;
+            const speedX = (Math.random() - 0.5) * 0.5;
+            const speedY = (Math.random() - 0.5) * 0.5;
+            
+            this.particles.push({
+                x,
+                y,
+                size,
+                speedX,
+                speedY,
+                baseX: x,
+                baseY: y
+            });
+        }
+    }
+
+    drawParticles() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let particle of this.particles) {
+            // Calculate distance from mouse
+            if (this.mouse.x != null && this.mouse.y != null) {
+                const dx = this.mouse.x - particle.x;
+                const dy = this.mouse.y - particle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Push particles away from mouse
+                if (distance < this.mouse.radius) {
+                    const force = (this.mouse.radius - distance) / this.mouse.radius;
+                    const angle = Math.atan2(dy, dx);
+                    particle.x -= Math.cos(angle) * force * 3;
+                    particle.y -= Math.sin(angle) * force * 3;
+                }
+            }
+            
+            // Gradually return to base position
+            const dxBase = particle.baseX - particle.x;
+            const dyBase = particle.baseY - particle.y;
+            particle.x += dxBase * 0.02 + particle.speedX;
+            particle.y += dyBase * 0.02 + particle.speedY;
+            
+            // Wrap around screen edges
+            if (particle.x < 0) particle.x = this.canvas.width;
+            if (particle.x > this.canvas.width) particle.x = 0;
+            if (particle.y < 0) particle.y = this.canvas.height;
+            if (particle.y > this.canvas.height) particle.y = 0;
+            
+            // Draw particle with gradient
+            const gradient = this.ctx.createRadialGradient(
+                particle.x, particle.y, 0,
+                particle.x, particle.y, particle.size * 2
+            );
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(79, 209, 199, 0.4)');
+            gradient.addColorStop(1, 'rgba(102, 126, 234, 0)');
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        // Draw connections between nearby particles
+        this.connectParticles();
+    }
+
+    connectParticles() {
+        for (let i = 0; i < this.particles.length; i++) {
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const dx = this.particles[i].x - this.particles[j].x;
+                const dy = this.particles[i].y - this.particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 120) {
+                    const opacity = (120 - distance) / 120 * 0.15;
+                    this.ctx.strokeStyle = `rgba(102, 126, 234, ${opacity})`;
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                    this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                    this.ctx.stroke();
+                }
+            }
+        }
+    }
+
+    animate() {
+        this.drawParticles();
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
 class CronChecker {
     constructor() {
         this.cronInput = document.getElementById('cronInput');
@@ -504,5 +643,6 @@ class CronChecker {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    new AnimatedBackground();
     new CronChecker();
 });
