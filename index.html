@@ -21,16 +21,43 @@
 
         <main class="main-content">
             <div class="input-section">
+                <div class="input-mode-toggle">
+                    <button class="mode-btn active" data-mode="natural" id="naturalModeBtn">
+                        <i class="fas fa-comments"></i>
+                        Natural Language
+                    </button>
+                    <button class="mode-btn" data-mode="cron" id="cronModeBtn">
+                        <i class="fas fa-code"></i>
+                        Cron Expression
+                    </button>
+                </div>
+                
                 <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="naturalInput" 
+                        placeholder="Try: 'on Monday and Friday at 3pm' or 'every 10 minutes' or 'weekdays at noon'"
+                        autocomplete="off"
+                        spellcheck="false"
+                        class="active-input"
+                    >
                     <input 
                         type="text" 
                         id="cronInput" 
                         placeholder="Enter your cron expression (e.g., 0 9 * * 1-5)"
                         autocomplete="off"
                         spellcheck="false"
+                        style="display: none;"
                     >
+                    <div class="converted-cron" id="convertedCron" style="display: none;">
+                        <span class="converted-label">Cron Expression:</span>
+                        <code id="convertedCronCode"></code>
+                        <button class="copy-btn" id="copyCronBtn" title="Copy to clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
                     <div class="input-help">
-                        <span class="format-hint">Format: minute hour day month weekday</span>
+                        <span class="format-hint" id="formatHint">Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"</span>
                         <button id="helpBtn" class="help-btn" title="Show help">
                             <i class="fas fa-question-circle"></i>
                         </button>
@@ -97,7 +124,7 @@
             </div>
 
             <div class="examples-section" id="examplesSection">
-                <h3>Common Examples</h3>
+                <h3>Try These Examples</h3>
                 <div class="examples-grid">
                     <button class="example-btn" data-cron="0 9 * * 1-5">
                         <span class="example-cron">0 9 * * 1-5</span>
@@ -123,6 +150,20 @@
                         <span class="example-cron">0 0 * * 6,0</span>
                         <span class="example-desc">Weekends at midnight</span>
                     </button>
+                </div>
+                
+                <div class="natural-examples" id="naturalExamples">
+                    <h4>Or try natural language:</h4>
+                    <div class="natural-examples-list">
+                        <button class="natural-example-btn" data-text="every 5 minutes">every 5 minutes</button>
+                        <button class="natural-example-btn" data-text="weekdays at 9am">weekdays at 9am</button>
+                        <button class="natural-example-btn" data-text="on Monday and Friday">on Monday and Friday</button>
+                        <button class="natural-example-btn" data-text="Monday, Wednesday, and Friday at 2pm">Monday, Wednesday, and Friday at 2pm</button>
+                        <button class="natural-example-btn" data-text="weekends at 10am">weekends at 10am</button>
+                        <button class="natural-example-btn" data-text="every Tuesday and Thursday">every Tuesday and Thursday</button>
+                        <button class="natural-example-btn" data-text="at midnight">at midnight</button>
+                        <button class="natural-example-btn" data-text="every day at noon">every day at noon</button>
+                    </div>
                 </div>
             </div>
         </main>

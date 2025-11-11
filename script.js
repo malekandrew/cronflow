@@ -138,15 +138,286 @@ class AnimatedBackground {
     }
 }
 
+// Natural Language to Cron Converter
+class NaturalLanguageParser {
+    constructor() {
+        this.weekdayMap = {
+            'sunday': 0, 'sun': 0,
+            'monday': 1, 'mon': 1,
+            'tuesday': 2, 'tue': 2, 'tues': 2,
+            'wednesday': 3, 'wed': 3,
+            'thursday': 4, 'thu': 4, 'thur': 4, 'thurs': 4,
+            'friday': 5, 'fri': 5,
+            'saturday': 6, 'sat': 6
+        };
+        
+        this.patterns = this.initializePatterns();
+    }
+
+    parseWeekdays(text) {
+        const days = [];
+        text = text.toLowerCase();
+        
+        for (let [name, num] of Object.entries(this.weekdayMap)) {
+            const regex = new RegExp(`\\b${name}\\b`, 'i');
+            if (regex.test(text)) {
+                if (!days.includes(num)) {
+                    days.push(num);
+                }
+            }
+        }
+        
+        return days.sort((a, b) => a - b);
+    }
+
+    parseTime(text) {
+        // Try to extract time in various formats
+        const timePatterns = [
+            /(\d+):(\d+)\s*(am|pm)/i,
+            /(\d+)\s*(am|pm)/i,
+            /at\s+(\d+):(\d+)/i,
+            /at\s+(\d+)/i
+        ];
+
+        for (let pattern of timePatterns) {
+            const match = text.match(pattern);
+            if (match) {
+                let hour = parseInt(match[1]);
+                let minute = 0;
+                
+                if (match[2] && !isNaN(parseInt(match[2]))) {
+                    minute = parseInt(match[2]);
+                }
+                
+                const period = match[3] || match[2];
+                if (period && typeof period === 'string') {
+                    const periodLower = period.toLowerCase();
+                    if (periodLower === 'pm' && hour !== 12) hour += 12;
+                    if (periodLower === 'am' && hour === 12) hour = 0;
+                }
+                
+                return { hour, minute };
+            }
+        }
+        
+        // Check for special times
+        if (/\bmidnight\b/i.test(text)) {
+            return { hour: 0, minute: 0 };
+        }
+        if (/\bnoon\b/i.test(text)) {
+            return { hour: 12, minute: 0 };
+        }
+        
+        return null;
+    }
+
+    initializePatterns() {
+        return [
+            // Multiple days with "and" or "," (must be before single day patterns)
+            {
+                regex: /(?:on\s+)?(?:every\s+)?([a-z,\s]+(?:and|,)\s*[a-z]+)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const daysText = match[1];
+                    const timeText = match[2] || '';
+                    
+                    // Check if this contains day names
+                    const hasDays = /monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun/i.test(daysText);
+                    
+                    if (!hasDays) return null;
+                    
+                    const days = this.parseWeekdays(daysText);
+                    
+                    if (days.length === 0) return null;
+                    
+                    const time = this.parseTime(text) || { hour: 9, minute: 0 };
+                    
+                    return `${time.minute} ${time.hour} * * ${days.join(',')}`;
+                }
+            },
+            
+            // Every X minutes/hours
+            {
+                regex: /every (\d+) (?:minute|minutes|min|mins)/i,
+                handler: (match) => `*/${match[1]} * * * *`
+            },
+            {
+                regex: /every (\d+) (?:hour|hours|hr|hrs)/i,
+                handler: (match) => `0 */${match[1]} * * *`
+            },
+            {
+                regex: /every minute/i,
+                handler: () => `* * * * *`
+            },
+            {
+                regex: /every hour/i,
+                handler: () => `0 * * * *`
+            },
+            
+            // Weekdays/Weekends with optional time
+            {
+                regex: /(?:every\s+)?(?:weekday|weekdays|monday through friday|mon-fri)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 9, minute: 0 };
+                    return `${time.minute} ${time.hour} * * 1-5`;
+                }
+            },
+            {
+                regex: /(?:every\s+)?(?:weekend|weekends|saturday and sunday|sat and sun)(?:\s+at\s+)?(.+)?/i,
+                handler: (match, text) => {
+                    const time = this.parseTime(text) || { hour: 10, minute: 0 };
+                    return `${time.minute} ${time.hour} * * 6,0`;
+                }
+            },
+            
+            // Specific day with time (must come before single day patterns)
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(monday|mon|tuesday|tue|wednesday|wed|thursday|thu|friday|fri|saturday|sat|sunday|sun)\s+at\s+(\d+)(?::(\d+))?\s*(am|pm)/i,
+                handler: (match) => {
+                    const dayName = match[1].toLowerCase();
+                    const dayNum = this.weekdayMap[dayName];
+                    let hour = parseInt(match[2]);
+                    const minute = match[3] ? parseInt(match[3]) : 0;
+                    const period = match[4].toLowerCase();
+                    
+                    if (period === 'pm' && hour !== 12) hour += 12;
+                    if (period === 'am' && hour === 12) hour = 0;
+                    
+                    return `${minute} ${hour} * * ${dayNum}`;
+                }
+            },
+            
+            // Single day without time
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(monday|mon)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 1`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(tuesday|tue)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 2`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(wednesday|wed)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 3`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(thursday|thu)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 4`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(friday|fri)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 5`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(saturday|sat)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 6`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(sunday|sun)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 0`
+            },
+            {
+                regex: /(?:every\s+)?(?:on\s+)?(sunday|sun)(?!\s+and)(?!\s*,)/i,
+                handler: () => `0 9 * * 0`
+            },
+            
+            // Daily with time
+            {
+                regex: /(?:every\s+)?day\s+at\s+(\d+)(?::(\d+))?\s*(am|pm)/i,
+                handler: (match) => {
+                    let hour = parseInt(match[1]);
+                    const minute = match[2] ? parseInt(match[2]) : 0;
+                    const period = match[3].toLowerCase();
+                    
+                    if (period === 'pm' && hour !== 12) hour += 12;
+                    if (period === 'am' && hour === 12) hour = 0;
+                    
+                    return `${minute} ${hour} * * *`;
+                }
+            },
+            {
+                regex: /(?:every\s+)?day/i,
+                handler: () => `0 0 * * *`
+            },
+            
+            // Just a time (applies to every day)
+            {
+                regex: /(?:at\s+)?(\d+)(?::(\d+))?\s*(am|pm)/i,
+                handler: (match) => {
+                    let hour = parseInt(match[1]);
+                    const minute = match[2] ? parseInt(match[2]) : 0;
+                    const period = match[3].toLowerCase();
+                    
+                    if (period === 'pm' && hour !== 12) hour += 12;
+                    if (period === 'am' && hour === 12) hour = 0;
+                    
+                    return `${minute} ${hour} * * *`;
+                }
+            },
+            
+            // Monthly
+            {
+                regex: /first day of (?:the\s+)?(?:every\s+)?month/i,
+                handler: () => `0 0 1 * *`
+            },
+            {
+                regex: /last day of (?:the\s+)?(?:every\s+)?month/i,
+                handler: () => `0 0 L * *`
+            },
+            
+            // Special times
+            {
+                regex: /(?:at\s+)?midnight/i,
+                handler: () => `0 0 * * *`
+            },
+            {
+                regex: /(?:at\s+)?noon/i,
+                handler: () => `0 12 * * *`
+            }
+        ];
+    }
+
+    parse(text) {
+        text = text.trim();
+        
+        if (!text) {
+            return null;
+        }
+
+        for (let pattern of this.patterns) {
+            const match = text.match(pattern.regex);
+            if (match) {
+                const result = pattern.handler(match, text);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+
+        return null;
+    }
+}
+
 class CronChecker {
     constructor() {
         this.cronInput = document.getElementById('cronInput');
+        this.naturalInput = document.getElementById('naturalInput');
         this.errorMessage = document.getElementById('errorMessage');
         this.errorText = document.getElementById('errorText');
         this.explanationContent = document.getElementById('explanationContent');
         this.scheduleContent = document.getElementById('scheduleContent');
         this.resultsSection = document.getElementById('resultsSection');
         this.examplesSection = document.getElementById('examplesSection');
+        
+        // Mode toggle elements
+        this.naturalModeBtn = document.getElementById('naturalModeBtn');
+        this.cronModeBtn = document.getElementById('cronModeBtn');
+        this.convertedCron = document.getElementById('convertedCron');
+        this.convertedCronCode = document.getElementById('convertedCronCode');
+        this.copyCronBtn = document.getElementById('copyCronBtn');
+        this.formatHint = document.getElementById('formatHint');
+        
+        // Current mode
+        this.currentMode = 'natural';
         
         // Field breakdown elements
         this.minuteField = document.getElementById('minuteField');
@@ -160,22 +431,60 @@ class CronChecker {
         this.helpBtn = document.getElementById('helpBtn');
         this.closeHelp = document.getElementById('closeHelp');
 
+        // Natural language parser
+        this.nlParser = new NaturalLanguageParser();
+
         this.init();
     }
 
     init() {
-        // Real-time input listener
+        // Real-time input listeners
         this.cronInput.addEventListener('input', (e) => {
             this.handleCronInput(e.target.value);
+        });
+
+        this.naturalInput.addEventListener('input', (e) => {
+            this.handleNaturalInput(e.target.value);
+        });
+
+        // Mode toggle
+        this.naturalModeBtn.addEventListener('click', () => {
+            this.switchMode('natural');
+        });
+
+        this.cronModeBtn.addEventListener('click', () => {
+            this.switchMode('cron');
+        });
+
+        // Copy button
+        this.copyCronBtn.addEventListener('click', () => {
+            this.copyCronToClipboard();
+        });
+
+        // Copy button
+        this.copyCronBtn.addEventListener('click', () => {
+            this.copyCronToClipboard();
         });
 
         // Example buttons
         document.querySelectorAll('.example-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const cronExpression = e.currentTarget.dataset.cron;
+                this.switchMode('cron');
                 this.cronInput.value = cronExpression;
                 this.handleCronInput(cronExpression);
                 this.cronInput.focus();
+            });
+        });
+
+        // Natural language example buttons
+        document.querySelectorAll('.natural-example-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.dataset.text;
+                this.switchMode('natural');
+                this.naturalInput.value = text;
+                this.handleNaturalInput(text);
+                this.naturalInput.focus();
             });
         });
 
@@ -196,6 +505,90 @@ class CronChecker {
 
         // Initial state
         this.showExamples();
+    }
+
+    switchMode(mode) {
+        this.currentMode = mode;
+        
+        if (mode === 'natural') {
+            this.naturalModeBtn.classList.add('active');
+            this.cronModeBtn.classList.remove('active');
+            this.naturalInput.style.display = 'block';
+            this.cronInput.style.display = 'none';
+            this.formatHint.textContent = 'Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"';
+            this.naturalInput.focus();
+            
+            // Clear and reset
+            const value = this.naturalInput.value.trim();
+            if (value) {
+                this.handleNaturalInput(value);
+            } else {
+                this.convertedCron.style.display = 'none';
+                this.showExamples();
+            }
+        } else {
+            this.cronModeBtn.classList.add('active');
+            this.naturalModeBtn.classList.remove('active');
+            this.cronInput.style.display = 'block';
+            this.naturalInput.style.display = 'none';
+            this.convertedCron.style.display = 'none';
+            this.formatHint.textContent = 'Format: minute hour day month weekday';
+            this.cronInput.focus();
+            
+            // Clear and reset
+            const value = this.cronInput.value.trim();
+            if (value) {
+                this.handleCronInput(value);
+            } else {
+                this.showExamples();
+            }
+        }
+    }
+
+    handleNaturalInput(text) {
+        text = text.trim();
+        
+        if (!text) {
+            this.convertedCron.style.display = 'none';
+            this.showExamples();
+            this.hideError();
+            return;
+        }
+
+        this.hideExamples();
+
+        const cronExpression = this.nlParser.parse(text);
+        
+        if (cronExpression) {
+            this.convertedCronCode.textContent = cronExpression;
+            this.convertedCron.style.display = 'flex';
+            
+            try {
+                const parsed = this.parseCron(cronExpression);
+                this.displayResults(parsed, cronExpression);
+                this.hideError();
+            } catch (error) {
+                this.showError(error.message);
+                this.hideResults();
+            }
+        } else {
+            this.convertedCron.style.display = 'none';
+            this.showError('Could not understand that expression. Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"');
+            this.hideResults();
+        }
+    }
+
+    copyCronToClipboard() {
+        const cronText = this.convertedCronCode.textContent;
+        navigator.clipboard.writeText(cronText).then(() => {
+            this.copyCronBtn.classList.add('copied');
+            this.copyCronBtn.innerHTML = '<i class="fas fa-check"></i>';
+            
+            setTimeout(() => {
+                this.copyCronBtn.classList.remove('copied');
+                this.copyCronBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        });
     }
 
     handleCronInput(cronExpression) {
