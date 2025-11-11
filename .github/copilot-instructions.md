@@ -144,3 +144,82 @@ js/
 **Animation change?** → AnimatedBackground.js
 
 Always update JSDoc, maintain single responsibility per module, extract constants.
+
+## Commit Message Conventions
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+### Format
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- **feat** - New feature
+- **fix** - Bug fix
+- **docs** - Documentation only changes
+- **style** - Code style changes (formatting, semicolons, etc.)
+- **refactor** - Code change that neither fixes a bug nor adds a feature
+- **test** - Adding or updating tests
+- **chore** - Maintenance tasks (dependencies, build, etc.)
+
+### Scopes (optional but recommended)
+- **nlp** - Natural language parser changes
+- **ui** - User interface changes
+- **branding** - Logo, styling, visual identity
+- **animation** - Canvas particle system
+- **parser** - Cron parsing logic
+- **scheduler** - Execution timing logic
+
+### Examples
+
+**Good commit messages:**
+```
+feat(nlp): add monthly and yearly natural language patterns
+
+- Support "once a month", "15th of each month"
+- Support "quarterly", "once a year"
+- Add logical operator support for "Monday and Friday"
+- Extend patterns array with 15 additional handlers
+```
+
+```
+refactor: modularize codebase with ES6 modules
+
+BREAKING CHANGE: Requires HTTP server (ES6 modules)
+
+Split monolithic script.js into 8 focused modules:
+- app.js (entry point)
+- CronChecker.js (UI orchestration)
+- NaturalLanguageParser.js (NLP patterns)
+- CronParser.js, CronScheduler.js, CronExplanationGenerator.js
+- AnimatedBackground.js, constants.js
+```
+
+```
+docs: prioritize npx http-server over Python in guides
+
+- Recommend Node.js npx method as primary
+- Remove PHP server option (outdated)
+- Update both README and QUICK_START
+```
+
+**Bad commit messages:**
+```
+update stuff
+fix bug
+refactor
+WIP
+```
+
+### Guidelines
+- **Be specific** - "add canvas particle animation" not "add animated background"
+- **Quantify changes** - "20+ patterns", "8 modules", "15 additional patterns"
+- **Use imperative mood** - "add feature" not "added feature" or "adds feature"
+- **List what changed** - Use bullet points for complex commits
+- **Explain why** - Add context for architectural decisions
+- **Note breaking changes** - Use BREAKING CHANGE footer when applicable
