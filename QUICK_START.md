@@ -24,25 +24,17 @@ cd cronflow
 
 CronFlow uses ES6 modules, which require serving files over HTTP. Choose your preferred method:
 
-#### Option A: Python (Recommended)
+#### Option A: Node.js with npx (Recommended)
+```bash
+npx http-server -p 8080
+```
+> No installation needed! `npx` comes with Node.js 5.2+ and runs packages directly.
+
+#### Option B: Python
 ```bash
 python3 -m http.server 8080
 ```
-
-#### Option B: Node.js
-```bash
-# If you have npx (comes with Node.js 5.2+)
-npx http-server -p 8080
-
-# Or install globally first
-npm install -g http-server
-http-server -p 8080
-```
-
-#### Option C: PHP
-```bash
-php -S localhost:8080
-```
+> Great if you have Python installed (most macOS/Linux systems do).
 
 ### Step 3: Open in Browser
 

@@ -32,7 +32,7 @@
 ### Prerequisites
 
 - A modern web browser (Chrome 61+, Firefox 60+, Safari 11+, or Edge 16+)
-- Python 3, Node.js, or PHP (for local server)
+- Node.js (recommended) or Python 3 (for local server)
 
 ### Installation
 
@@ -46,19 +46,15 @@
    
    Choose one of the following methods:
    
-   **Python:**
-   ```bash
-   python3 -m http.server 8080
-   ```
-   
-   **Node.js:**
+   **Node.js (Recommended):**
    ```bash
    npx http-server -p 8080
    ```
+   > No installation needed! `npx` comes with Node.js 5.2+ and runs packages directly.
    
-   **PHP:**
+   **Python:**
    ```bash
-   php -S localhost:8080
+   python3 -m http.server 8080
    ```
 
 3. **Open in browser**
