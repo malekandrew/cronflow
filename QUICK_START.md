@@ -64,10 +64,14 @@ In DevTools **Network** tab, verify these files loaded successfully (status 200)
 - ✅ `js/constants.js`
 - ✅ `js/AnimatedBackground.js`
 - ✅ `js/CronChecker.js`
+- ✅ `js/SemanticNLPEngine.js` 🆕
+- ✅ `js/NLPToCronConverter.js` 🆕
 - ✅ `js/NaturalLanguageParser.js`
 - ✅ `js/CronParser.js`
 - ✅ `js/CronScheduler.js`
 - ✅ `js/CronExplanationGenerator.js`
+- ✅ `node_modules/compromise/...` 🆕
+- ✅ `node_modules/chrono-node/...` 🆕
 
 ---
 
@@ -75,36 +79,65 @@ In DevTools **Network** tab, verify these files loaded successfully (status 200)
 
 ### Natural Language Mode (Default)
 
-CronFlow starts in Natural Language mode. Try these examples:
+CronFlow uses advanced NLP (compromise.js + chrono-node) to understand complex phrases:
 
-**Time-based:**
+**Simple Intervals:**
 - Type: `every 5 minutes`
 - Result: `*/5 * * * *`
 
-**Daily:**
+- Type: `every couple of hours`
+- Result: `0 */2 * * *`
+
+**Daily Schedules:**
 - Type: `daily at 3pm`
 - Result: `0 15 * * *`
 
-**Weekly:**
+- Type: `business days at 9am`
+- Result: `0 9 * * 1-5`
+
+**Weekly Schedules:**
 - Type: `weekdays at 9am`
 - Result: `0 9 * * 1-5`
 
+- Type: `Monday to Friday at 9:30am`
+- Result: `30 9 * * 1-5`
+
 - Type: `every Monday and Friday at 2:30pm`
 - Result: `30 14 * * 1,5`
+
+**Complex Multi-Component:**
+- Type: `every monday and thursday at 10am in January to April`
+- Result: `0 10 * 1,2,3,4 1,4`
+
+- Type: `every weekday at 10am in June to August`
+- Result: `0 10 * 6,7,8 1-5`
 
 **Monthly:**
 - Type: `once a month`
 - Result: `0 0 1 * *`
 
-- Type: `15th of each month at midnight`
-- Result: `0 0 15 * *`
+- Type: `on the 15th of each month at 3pm`
+- Result: `0 15 15 * *`
+
+- Type: `at the start of every month`
+- Result: `0 0 1 * *`
 
 **Yearly:**
-- Type: `quarterly`
-- Result: `0 0 1 1,4,7,10 *`
+- Type: `quarterly at midnight`
+- Result: `0 0 1 */3 *`
 
-- Type: `once a year`
-- Result: `0 0 1 1 *`
+- Type: `annually on December 25th at midnight`
+- Result: `0 0 25 12 *`
+
+**Word Numbers & Smart Parsing:**
+- Type: `every five minutes` (word → number)
+- Result: `*/5 * * * *`
+
+- Type: `every other day at noon`
+- Result: `0 12 */2 * *`
+
+> 💡 **Tip**: If no time is specified, it defaults to midnight (00:00)
+> Example: "every Monday" → `0 0 * * 1`
 
 ### Cron Expression Mode
 

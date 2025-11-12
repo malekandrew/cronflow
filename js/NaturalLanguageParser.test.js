@@ -20,9 +20,15 @@ describe('NaturalLanguageParser', () => {
 		expect(result).toBe('0 9 * * 1-5');
 	});
 
-	it('should parse "every Monday"', () => {
+	it('should parse "every Monday" with default time', () => {
 		const parser = new NaturalLanguageParser();
 		const result = parser.parse('every Monday');
+		expect(result).toBe('0 0 * * 1'); // Defaults to midnight
+	});
+
+	it('should parse "every Monday at 9am"', () => {
+		const parser = new NaturalLanguageParser();
+		const result = parser.parse('every Monday at 9am');
 		expect(result).toBe('0 9 * * 1');
 	});
 

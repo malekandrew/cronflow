@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Orbitron:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Import map for NPM dependencies -->
+    <script type="importmap">
+    {
+        "imports": {
+            "compromise": "./node_modules/compromise/src/three.js",
+            "chrono-node": "./node_modules/chrono-node/dist/esm/index.js",
+            "efrt": "./node_modules/efrt/src/index.js",
+            "grad-school": "./node_modules/grad-school/src/index.js",
+            "suffix-thumb": "./node_modules/suffix-thumb/src/index.js"
+        }
+    }
+    </script>
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>

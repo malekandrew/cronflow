@@ -1,15 +1,102 @@
 /**
  * NaturalLanguageParser - Converts human-readable text to cron expressions
  * Supports various natural language patterns for scheduling
+ * Now uses hybrid approach: Advanced NLP first, regex patterns as fallback
  */
 
 import { CONFIG, WEEKDAY_MAP, MONTH_MAP } from './constants.js';
+import { SemanticNLPEngine } from './SemanticNLPEngine.js';
+import { NLPToCronConverter } from './NLPToCronConverter.js';
 
 export class NaturalLanguageParser {
     constructor() {
         this.weekdayMap = WEEKDAY_MAP;
         this.monthMap = MONTH_MAP;
         this.patterns = this.initializePatterns();
+        
+        // Initialize NLP engines
+        this.nlpEngine = new SemanticNLPEngine();
+        this.cronConverter = new NLPToCronConverter();
+        
+        // Track which parser was used (for debugging/analytics)
+        this.lastParserUsed = null;
+    }
+
+    /**
+     * Parse natural language to cron expression using hybrid approach
+     * Tries advanced NLP first, falls back to regex patterns
+     * @param {string} text - Natural language input
+     * @returns {string|null} Cron expression or null if parsing fails
+     */
+    parse(text) {
+        if (!text || typeof text !== 'string' || !text.trim()) {
+            return null;
+        }
+
+        // Step 1: Try advanced NLP parsing
+        try {
+            const nlpResult = this.nlpEngine.parse(text);
+            if (nlpResult) {
+                const cronExpression = this.cronConverter.convert(nlpResult);
+                if (cronExpression) {
+                    this.lastParserUsed = 'nlp';
+                    console.log('NLP Parser:', {
+                        input: text,
+                        parsed: nlpResult,
+                        cron: cronExpression,
+                        description: this.nlpEngine.describe(nlpResult)
+                    });
+                    return cronExpression;
+                }
+            }
+        } catch (error) {
+            console.warn('NLP parsing failed, falling back to regex:', error.message);
+        }
+
+        // Step 2: Fall back to regex patterns
+        const regexResult = this.parseWithRegex(text);
+        if (regexResult) {
+            this.lastParserUsed = 'regex';
+            console.log('Regex Parser:', {
+                input: text,
+                cron: regexResult
+            });
+            return regexResult;
+        }
+
+        this.lastParserUsed = null;
+        return null;
+    }
+
+    /**
+     * Parse using regex patterns (legacy method)
+     * @param {string} text - Natural language input
+     * @returns {string|null} Cron expression or null
+     */
+    parseWithRegex(text) {
+        const lowerText = text.toLowerCase().trim();
+
+        for (const pattern of this.patterns) {
+            const match = lowerText.match(pattern.regex);
+            if (match) {
+                try {
+                    return pattern.handler(match, lowerText);
+                } catch (error) {
+                    console.error('Pattern handler error:', error);
+                    continue;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get information about which parser was used for the last parse
+     * @returns {string|null} 'nlp', 'regex', or null
+     */
+    getLastParserUsed() {
+        return this.lastParserUsed;
     }
 
     /**
@@ -419,28 +506,4 @@ export class NaturalLanguageParser {
         ];
     }
 
-    /**
-     * Parse natural language text to cron expression
-     * @param {string} text - Natural language input
-     * @returns {string|null} Cron expression or null if failed
-     */
-    parse(text) {
-        text = text.trim();
-        
-        if (!text) {
-            return null;
-        }
-
-        for (const pattern of this.patterns) {
-            const match = text.match(pattern.regex);
-            if (match) {
-                const result = pattern.handler(match, text);
-                if (result) {
-                    return result;
-                }
-            }
-        }
-
-        return null;
-    }
 }

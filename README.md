@@ -16,7 +16,11 @@
 
 ## 🌟 Features
 
-- **🗣️ Natural Language Input**: Convert phrases like "every Monday at 3pm" or "quarterly" into cron expressions
+- **🗣️ Advanced Natural Language Processing**: Powered by compromise.js and chrono-node for intelligent text understanding
+  - Complex phrases: "every monday and thursday at 10am in January to April"
+  - Word numbers: "every five minutes", "every couple of hours"
+  - Date ranges: "Monday to Friday", "January to March"
+  - Smart defaults: omitted times default to midnight (00:00)
 - **✅ Real-time Validation**: Instant feedback on cron expression validity
 - **📖 Human-Readable Explanations**: See what your cron expression means in plain English
 - **⏭️ Next Execution Times**: View the next 5 scheduled runs with relative time
@@ -24,8 +28,7 @@
 - **✨ Interactive Background**: Subtle particle animation that responds to cursor movement
 - **📋 Copy to Clipboard**: One-click copy of generated cron expressions
 - **🎨 Modern UI**: Clean, responsive design with smooth animations
-
-- **🎨 Modern UI**: Clean, responsive design with smooth animations
+- **🔄 Hybrid Parser**: Advanced NLP with intelligent fallback to regex patterns
 
 ## 🚀 Quick Start
 
@@ -67,9 +70,31 @@
 
 ### Natural Language Mode
 Type in plain English and see the cron expression generated instantly:
+
+**Simple Intervals:**
 - "every 5 minutes" → `*/5 * * * *`
+- "every couple of hours" → `0 */2 * * *`
+
+**Scheduled Times:**
 - "weekdays at 9am" → `0 9 * * 1-5`
-- "quarterly at 3pm" → `0 15 1 1,4,7,10 *`
+- "Monday to Friday at 9:30am" → `30 9 * * 1-5`
+- "every Monday and Friday at 2:30pm" → `30 14 * * 1,5`
+
+**Complex Schedules:**
+- "every monday and thursday at 10am in January to April" → `0 10 * 1,2,3,4 1,4`
+- "business days at 9am" → `0 9 * * 1-5`
+- "every weekday at 10am in June to August" → `0 10 * 6,7,8 1-5`
+
+**Monthly & Yearly:**
+- "quarterly at midnight" → `0 0 1 */3 *`
+- "on the 15th of each month at 3pm" → `0 15 15 * *`
+- "at the start of every month" → `0 0 1 * *`
+- "annually on December 25th at midnight" → `0 0 25 12 *`
+
+**Special Cases:**
+- "every Monday" (defaults to midnight) → `0 0 * * 1`
+- "daily at midnight" → `0 0 * * *`
+- "every other day at noon" → `0 12 */2 * *`
 
 ### Cron Expression Mode
 Enter standard cron expressions and get human-readable explanations with execution schedules.
@@ -89,41 +114,52 @@ graph TB
         C[AnimatedBackground.js]
     end
     
+    subgraph "NLP Layer - NEW"
+        D[SemanticNLPEngine.js<br/>compromise.js + chrono-node]
+        E[NLPToCronConverter.js]
+    end
+    
     subgraph "Parser Layer"
-        D[NaturalLanguageParser.js]
-        E[CronParser.js]
+        F[NaturalLanguageParser.js<br/>Hybrid: NLP + Regex]
+        G[CronParser.js]
     end
     
     subgraph "Logic Layer"
-        F[CronScheduler.js]
-        G[CronExplanationGenerator.js]
+        H[CronScheduler.js]
+        I[CronExplanationGenerator.js]
     end
     
     subgraph "Configuration"
-        H[constants.js]
+        J[constants.js]
     end
     
     A --> B
     A --> C
-    B --> D
-    B --> E
     B --> F
     B --> G
-    D --> H
-    E --> H
-    F --> H
-    G --> H
-    C --> H
+    B --> H
+    B --> I
+    F --> D
+    F --> E
+    D --> J
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    C --> J
     
     style A fill:#667eea
     style B fill:#764ba2
     style C fill:#4fd1c7
-    style D fill:#f093fb
-    style E fill:#f5576c
-    style F fill:#feca57
-    style G fill:#48dbfb
-    style H fill:#ff9ff3
-```
+    style D fill:#10b981
+    style E fill:#10b981
+    style F fill:#f093fb
+    style G fill:#f5576c
+    style H fill:#feca57
+    style I fill:#48dbfb
+    style J fill:#ff9ff3
+````
 
 ### Module Responsibilities
 
@@ -132,7 +168,9 @@ graph TB
 | **app.js** | Application entry point and initialization | 17 |
 | **constants.js** | Centralized configuration and constants | 95 |
 | **AnimatedBackground.js** | Canvas particle animation system | 228 |
-| **NaturalLanguageParser.js** | Natural language to cron conversion | 435 |
+| **SemanticNLPEngine.js** | 🆕 Advanced NLP using compromise + chrono-node | 507 |
+| **NLPToCronConverter.js** | 🆕 Converts structured NLP to cron expressions | 400 |
+| **NaturalLanguageParser.js** | Hybrid parser (NLP primary, regex fallback) | 500 |
 | **CronParser.js** | Cron expression parsing and validation | 271 |
 | **CronScheduler.js** | Execution time calculations | 141 |
 | **CronExplanationGenerator.js** | Human-readable descriptions | 155 |
@@ -145,17 +183,28 @@ sequenceDiagram
     participant U as User
     participant UI as CronChecker
     participant NL as NaturalLanguageParser
+    participant SE as SemanticNLPEngine
+    participant NC as NLPToCronConverter
     participant CP as CronParser
     participant CS as CronScheduler
     participant CE as CronExplanationGenerator
     
-    U->>UI: Type "every 5 minutes"
-    UI->>NL: parse("every 5 minutes")
-    NL-->>UI: "*/5 * * * *"
-    UI->>CP: parse("*/5 * * * *")
+    U->>UI: Type "every monday and thursday at 10am"
+    UI->>NL: parse(text)
+    NL->>SE: parse(text)
+    SE-->>NL: {time, weekdays, months, ...}
+    NL->>NC: convert(nlpResult)
+    NC-->>NL: "0 10 * * 1,4"
+    alt NLP Success
+        NL-->>UI: "0 10 * * 1,4"
+    else NLP Failed
+        NL->>NL: parseWithRegex(text)
+        NL-->>UI: Regex result
+    end
+    UI->>CP: parse("0 10 * * 1,4")
     CP-->>UI: {parsed cron object}
     UI->>CE: generateExplanation(parsed)
-    CE-->>UI: "Runs every 5 minutes"
+    CE-->>UI: "Runs every Monday and Thursday at 10:00 AM"
     UI->>CS: generateNextExecutions(parsed)
     CS-->>UI: [Date, Date, Date, ...]
     UI->>U: Display results
@@ -171,48 +220,80 @@ cronflow/
 │   ├── app.js                         # Application entry point
 │   ├── constants.js                   # Configuration and constants
 │   ├── AnimatedBackground.js          # Particle animation system
-│   ├── NaturalLanguageParser.js       # Natural language to cron converter
+│   ├── SemanticNLPEngine.js           # 🆕 Advanced NLP parser (compromise + chrono)
+│   ├── NLPToCronConverter.js          # 🆕 NLP result to cron converter
+│   ├── NaturalLanguageParser.js       # Hybrid parser (NLP + regex fallback)
 │   ├── CronParser.js                  # Cron expression parser/validator
 │   ├── CronScheduler.js               # Execution time calculator
 │   ├── CronExplanationGenerator.js    # Human-readable descriptions
 │   └── CronChecker.js                 # Main application orchestrator
+├── package.json                        # Dependencies (compromise, chrono-node)
 ├── README.md                          # Project documentation
 ├── QUICK_START.md                     # Quick start guide
-└── REFACTORING_SUMMARY.md             # Refactoring documentation
+└── CONTRIBUTING.md                    # Contributing guidelines
 ```
 
 ## 📚 Documentation
 
 ### Natural Language Patterns
 
-CronFlow supports a wide variety of natural language patterns:
+CronFlow uses advanced NLP (compromise.js + chrono-node) with regex fallback to support complex patterns:
 
-#### Time-Based
+#### Time-Based Intervals
 - `every N minutes/hours` → `*/N * * * *` or `0 */N * * *`
 - `every minute/hour/day` → `* * * * *`, `0 * * * *`, `0 0 * * *`
+- `every five minutes` → `*/5 * * * *` (word numbers supported)
+- `every couple of hours` → `0 */2 * * *`
+- `every other day` → `0 0 */2 * *`
 
 #### Daily Schedules
 - `daily at 3pm` → `0 15 * * *`
 - `every day at 9:30am` → `30 9 * * *`
+- `business days at 9am` → `0 9 * * 1-5`
 
 #### Weekly Schedules
-- `every Monday` → `0 9 * * 1`
-- `weekdays` → `0 9 * * 1-5`
-- `weekends` → `0 10 * * 0,6`
-- `Monday and Friday` → `0 9 * * 1,5`
-- `every Monday and Wednesday at 2:30pm` → `30 14 * * 1,3`
+- `every Monday` → `0 0 * * 1` (defaults to midnight)
+- `every Monday at 9am` → `0 9 * * 1`
+- `weekdays at 9am` → `0 9 * * 1-5`
+- `Monday to Friday at 9:30am` → `30 9 * * 1-5` (range support)
+- `every Monday and Friday at 2:30pm` → `30 14 * * 1,5`
+- `every saturday and sunday at 8am` → `0 8 * * 0,6`
 
 #### Monthly Schedules
 - `once a month` → `0 0 1 * *`
-- `15th of each month` → `0 0 15 * *`
-- `last day of month` → `0 0 L * *` (approximated)
-- `first Monday of month` → `0 0 1-7 * 1`
+- `on the 15th of each month at 3pm` → `0 15 15 * *`
+- `at the start of every month` → `0 0 1 * *`
+- `first monday of every month` → `0 0 1-7 * 1` (approximation)
+
+#### Complex Multi-Component Schedules
+- `every monday and thursday at 10am in January to April` → `0 10 * 1,2,3,4 1,4`
+- `every Tuesday and Thursday in March` → `0 0 * 3 2,4`
+- `every weekday at 10am in June to August` → `0 10 * 6,7,8 1-5`
 
 #### Yearly Schedules
-- `once a year` → `0 0 1 1 *`
-- `quarterly` → `0 0 1 1,4,7,10 *`
-- `every January 1st` → `0 0 1 1 *`
-- `New Year's Day` → `0 0 1 1 *`
+- `quarterly at midnight` → `0 0 1 */3 *`
+- `annually on December 25th at midnight` → `0 0 25 12 *`
+
+### NLP Features
+
+**Word-to-Number Conversion:**
+- "five minutes" → 5
+- "couple of hours" → 2
+- "dozen" → 12
+
+**Smart Normalization:**
+- "business days" → "weekdays"
+- "mon-fri" → "Monday to Friday"
+- "every other" → "every 2"
+
+**Date Range Support:**
+- "Monday to Friday" → weekdays 1-5
+- "January to March" → months 1,2,3
+- Wrap-around: "November to February" → 11,12,1,2
+
+**Default Time:**
+- Phrases without explicit times default to 00:00 (midnight)
+- Example: "every Monday" → `0 0 * * 1`
 
 ### Cron Expression Format
 
