@@ -17,6 +17,9 @@ export class CronChecker {
         // Current input mode
         this.currentMode = 'natural';
         
+        // Initialize theme
+        this.initializeTheme();
+        
         // Get DOM elements
         this.initializeElements();
         
@@ -25,6 +28,16 @@ export class CronChecker {
         
         // Initial state
         this.showExamples();
+    }
+
+    /**
+     * Initialize theme from localStorage
+     */
+    initializeTheme() {
+        const savedTheme = localStorage.getItem('cronflow-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
     }
 
     /**
@@ -37,6 +50,10 @@ export class CronChecker {
         this.convertedCron = document.getElementById('convertedCron');
         this.convertedCronCode = document.getElementById('convertedCronCode');
         this.copyCronBtn = document.getElementById('copyCronBtn');
+        
+        // Clear buttons
+        this.clearNaturalBtn = document.getElementById('clearNaturalBtn');
+        this.clearCronBtn = document.getElementById('clearCronBtn');
         
         // Mode toggle buttons
         this.naturalModeBtn = document.getElementById('naturalModeBtn');
@@ -62,6 +79,16 @@ export class CronChecker {
         this.helpModal = document.getElementById('helpModal');
         this.closeHelp = document.getElementById('closeHelp');
         
+        // NLP modal
+        this.nlpGuideBtn = document.getElementById('nlpGuideBtn');
+        this.nlpModal = document.getElementById('nlpModal');
+        this.closeNlp = document.getElementById('closeNlp');
+        
+        // Theme toggle
+        this.themeToggle = document.getElementById('themeToggle');
+        this.themeIcon = document.getElementById('themeIcon');
+        this.themeLabel = document.getElementById('themeLabel');
+        
         // Format hint
         this.formatHint = document.getElementById('formatHint');
     }
@@ -73,23 +100,42 @@ export class CronChecker {
         // Natural language input
         this.naturalInput.addEventListener('input', (e) => {
             this.handleNaturalInput(e.target.value);
+            this.toggleClearButton(this.naturalInput, this.clearNaturalBtn);
         });
 
         this.naturalInput.addEventListener('focus', () => {
             if (this.currentMode !== 'natural') {
                 this.switchMode('natural');
             }
+            this.toggleClearButton(this.naturalInput, this.clearNaturalBtn);
         });
 
         // Cron input
         this.cronInput.addEventListener('input', (e) => {
             this.handleCronInput(e.target.value);
+            this.toggleClearButton(this.cronInput, this.clearCronBtn);
         });
 
         this.cronInput.addEventListener('focus', () => {
             if (this.currentMode !== 'cron') {
                 this.switchMode('cron');
             }
+            this.toggleClearButton(this.cronInput, this.clearCronBtn);
+        });
+
+        // Clear buttons
+        this.clearNaturalBtn.addEventListener('click', () => {
+            this.naturalInput.value = '';
+            this.handleNaturalInput('');
+            this.clearNaturalBtn.classList.remove('visible');
+            this.naturalInput.focus();
+        });
+
+        this.clearCronBtn.addEventListener('click', () => {
+            this.cronInput.value = '';
+            this.handleCronInput('');
+            this.clearCronBtn.classList.remove('visible');
+            this.cronInput.focus();
         });
 
         // Mode toggle buttons
@@ -142,6 +188,29 @@ export class CronChecker {
                 this.helpModal.classList.remove('show');
             }
         });
+
+        // NLP Guide modal
+        this.nlpGuideBtn.addEventListener('click', () => {
+            this.nlpModal.classList.add('show');
+        });
+
+        this.closeNlp.addEventListener('click', () => {
+            this.nlpModal.classList.remove('show');
+        });
+
+        this.nlpModal.addEventListener('click', (e) => {
+            if (e.target === this.nlpModal) {
+                this.nlpModal.classList.remove('show');
+            }
+        });
+
+        // Theme toggle
+        this.themeToggle.addEventListener('click', () => {
+            this.toggleTheme();
+        });
+        
+        // Update theme label on load
+        this.updateThemeUI();
     }
 
     /**
@@ -362,6 +431,19 @@ export class CronChecker {
     }
 
     /**
+     * Toggle clear button visibility based on input value
+     * @param {HTMLInputElement} input - Input element
+     * @param {HTMLButtonElement} button - Clear button element
+     */
+    toggleClearButton(input, button) {
+        if (input.value.trim()) {
+            button.classList.add('visible');
+        } else {
+            button.classList.remove('visible');
+        }
+    }
+
+    /**
      * Show error message
      * @param {string} message - Error message to display
      */
@@ -380,5 +462,29 @@ export class CronChecker {
      */
     hideError() {
         this.errorMessage.style.display = 'none';
+    }
+
+    /**
+     * Toggle between light and dark theme
+     */
+    toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('cronflow-theme', isLight ? 'light' : 'dark');
+        this.updateThemeUI();
+    }
+
+    /**
+     * Update theme toggle button UI
+     */
+    updateThemeUI() {
+        const isLight = document.body.classList.contains('light-mode');
+        if (isLight) {
+            this.themeIcon.className = 'fas fa-sun';
+            this.themeLabel.textContent = 'Light';
+        } else {
+            this.themeIcon.className = 'fas fa-moon';
+            this.themeLabel.textContent = 'Dark';
+        }
     }
 }

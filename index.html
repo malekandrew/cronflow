@@ -48,6 +48,20 @@
                 </div>
             </div>
             <p class="subtitle">Master your cron expressions with natural language and real-time feedback</p>
+            <div class="header-actions">
+                <button id="themeToggle" class="header-btn" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                    <span id="themeLabel">Dark</span>
+                </button>
+                <button id="nlpGuideBtn" class="header-btn" title="Natural Language Guide">
+                    <i class="fas fa-brain"></i>
+                    <span>NL Guide</span>
+                </button>
+                <button id="helpBtn" class="header-btn" title="Cron Format Help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help</span>
+                </button>
+            </div>
         </header>
 
         <main class="main-content">
@@ -72,6 +86,9 @@
                         spellcheck="false"
                         class="active-input"
                     >
+                    <button class="clear-input-btn" id="clearNaturalBtn" aria-label="Clear input">
+                        <i class="fas fa-times"></i>
+                    </button>
                     <input 
                         type="text" 
                         id="cronInput" 
@@ -80,6 +97,9 @@
                         spellcheck="false"
                         style="display: none;"
                     >
+                    <button class="clear-input-btn" id="clearCronBtn" aria-label="Clear input">
+                        <i class="fas fa-times"></i>
+                    </button>
                     <div class="converted-cron" id="convertedCron" style="display: none;">
                         <span class="converted-label">Cron Expression:</span>
                         <code id="convertedCronCode"></code>
@@ -89,9 +109,6 @@
                     </div>
                     <div class="input-help">
                         <span class="format-hint" id="formatHint">Try: "every 5 minutes", "weekdays at 9am", "on Monday and Friday"</span>
-                        <button id="helpBtn" class="help-btn" title="Show help">
-                            <i class="fas fa-question-circle"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -263,6 +280,89 @@
                             <li><strong>,</strong> - List separator</li>
                             <li><strong>-</strong> - Range</li>
                             <li><strong>/</strong> - Step values</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NLP Capabilities Modal -->
+        <div class="help-modal" id="nlpModal">
+            <div class="help-content nlp-modal-content">
+                <div class="help-header">
+                    <h3><i class="fas fa-brain" style="color: var(--accent-color); margin-right: 0.5rem;"></i>Natural Language Guide</h3>
+                    <button id="closeNlp" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="help-body">
+                    <div class="nlp-section">
+                        <h4><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Supported Patterns</h4>
+                        
+                        <div class="nlp-category">
+                            <h5>⏱️ Time Intervals</h5>
+                            <ul>
+                                <li>"every 5 minutes"</li>
+                                <li>"every hour"</li>
+                                <li>"every couple of hours"</li>
+                                <li>"every other day"</li>
+                            </ul>
+                        </div>
+
+                        <div class="nlp-category">
+                            <h5>📅 Daily Schedules</h5>
+                            <ul>
+                                <li>"daily at 3pm"</li>
+                                <li>"every day at 9:30am"</li>
+                                <li>"business days at 9am"</li>
+                            </ul>
+                        </div>
+
+                        <div class="nlp-category">
+                            <h5>📆 Weekly Schedules</h5>
+                            <ul>
+                                <li>"every Monday"</li>
+                                <li>"weekdays at 9am"</li>
+                                <li>"Monday to Friday at 9:30am"</li>
+                                <li>"every Monday and Friday at 2:30pm"</li>
+                            </ul>
+                        </div>
+
+                        <div class="nlp-category">
+                            <h5>🗓️ Monthly & Yearly</h5>
+                            <ul>
+                                <li>"once a month"</li>
+                                <li>"15th of each month at 3pm"</li>
+                                <li>"quarterly at midnight"</li>
+                                <li>"annually on December 25th"</li>
+                            </ul>
+                        </div>
+
+                        <div class="nlp-category">
+                            <h5>🎯 Complex Schedules</h5>
+                            <ul>
+                                <li>"every Monday and Thursday at 10am in January to April"</li>
+                                <li>"weekdays at 10am in June to August"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="nlp-section nlp-features">
+                        <h4><i class="fas fa-magic" style="color: var(--secondary-color);"></i> Smart Features</h4>
+                        <ul>
+                            <li>✨ Word numbers: "five minutes", "couple of hours"</li>
+                            <li>📍 Date ranges: "Monday to Friday", "January to March"</li>
+                            <li>🕐 Default time: Phrases without time default to midnight (00:00)</li>
+                            <li>💼 Business terms: "business days", "weekdays"</li>
+                        </ul>
+                    </div>
+
+                    <div class="nlp-section nlp-not-supported">
+                        <h4><i class="fas fa-times-circle" style="color: var(--error-color);"></i> Not Supported</h4>
+                        <ul>
+                            <li>❌ Relative dates: "next Tuesday", "in 3 days"</li>
+                            <li>❌ Conditional: "only on holidays", "except weekends"</li>
+                            <li>💡 Tip: Be specific with days, times, and frequencies</li>
                         </ul>
                     </div>
                 </div>
