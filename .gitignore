@@ -48,6 +48,25 @@ node_modules/
 dist/
 build/
 
+# Test files and coverage
+test-*.js
+coverage/
+.vitest/
+*.test.js.snap
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# GitHub Copilot instructions (development only)
+.github/copilot-instructions.md
+.github/chatmodes/
+
+# Temporary files
+*.tmp
+*.temp
+
 # Temporary files
 tmp/
 temp/

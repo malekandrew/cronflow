@@ -32,7 +32,7 @@ Enhancement suggestions are welcome! Please provide:
 
 1. **Fork the repository**
    ```bash
-   git clone https://github.com/yourusername/cronflow.git
+   git clone https://github.com/malekandrew/cronflow.git
    cd cronflow
    git checkout -b feature/your-feature-name
    ```

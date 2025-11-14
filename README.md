@@ -16,19 +16,18 @@
 
 ## 🌟 Features
 
-- **🗣️ Advanced Natural Language Processing**: Powered by compromise.js and chrono-node for intelligent text understanding
-  - Complex phrases: "every monday and thursday at 10am in January to April"
-  - Word numbers: "every five minutes", "every couple of hours"
-  - Date ranges: "Monday to Friday", "January to March"
-  - Smart defaults: omitted times default to midnight (00:00)
-- **✅ Real-time Validation**: Instant feedback on cron expression validity
-- **📖 Human-Readable Explanations**: See what your cron expression means in plain English
-- **⏭️ Next Execution Times**: View the next 5 scheduled runs with relative time
-- **🔍 Field Breakdown**: Understand each component (minute, hour, day, month, weekday)
+- **🗣️ Advanced Natural Language Processing**: Powered by compromise.js and chrono-node with intelligent regex fallback
+- **🧠 Complex Multi-Part Phrases**: Parse schedules like "every monday and thursday at 10am in January to April"
+- **🔢 Word Number Support**: Understand "every five minutes", "every couple of hours", "every dozen days"
+- **📅 Date Range Parsing**: Handle "Monday to Friday", "January to March", with wrap-around support
+- **🕐 Smart Time Defaults**: Omitted times automatically default to midnight (00:00)
+- **🌓 Light/Dark Mode Toggle**: Seamless theme switching with localStorage persistence
+- **✅ Real-time Validation**: Instant feedback on cron expression validity with human-readable explanations
+- **⏭️ Next Execution Times**: View the next 5 scheduled runs with relative time formatting
+- **🔍 Field Breakdown**: Detailed component analysis (minute, hour, day, month, weekday)
 - **✨ Interactive Background**: Subtle particle animation that responds to cursor movement
 - **📋 Copy to Clipboard**: One-click copy of generated cron expressions
 - **🎨 Modern UI**: Clean, responsive design with smooth animations
-- **🔄 Hybrid Parser**: Advanced NLP with intelligent fallback to regex patterns
 
 ## 🚀 Quick Start
 
@@ -41,11 +40,16 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/cronflow.git
+   git clone https://github.com/malekandrew/cronflow.git
    cd cronflow
    ```
 
-2. **Start a local server**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start a local server**
    
    Choose one of the following methods:
    
@@ -170,11 +174,11 @@ graph TB
 | **AnimatedBackground.js** | Canvas particle animation system | 228 |
 | **SemanticNLPEngine.js** | 🆕 Advanced NLP using compromise + chrono-node | 507 |
 | **NLPToCronConverter.js** | 🆕 Converts structured NLP to cron expressions | 400 |
-| **NaturalLanguageParser.js** | Hybrid parser (NLP primary, regex fallback) | 500 |
+| **NaturalLanguageParser.js** | Hybrid parser (NLP primary, regex fallback) | 504 |
 | **CronParser.js** | Cron expression parsing and validation | 271 |
 | **CronScheduler.js** | Execution time calculations | 141 |
 | **CronExplanationGenerator.js** | Human-readable descriptions | 155 |
-| **CronChecker.js** | Main UI orchestration and event handling | 397 |
+| **CronChecker.js** | Main UI orchestration and event handling | 490 |
 
 ### Component Interaction Flow
 

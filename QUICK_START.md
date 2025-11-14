@@ -14,10 +14,13 @@ Get up and running with CronFlow in under 2 minutes!
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cronflow.git
+git clone https://github.com/malekandrew/cronflow.git
 
 # Navigate to the project directory
 cd cronflow
+
+# Install dependencies
+npm install
 ```
 
 ### Step 2: Start a Local Server
@@ -287,10 +290,10 @@ cronflow/
 
 **Ready to master cron expressions?** 🎉
 
-[📚 Full Documentation](README.md) • [🐛 Report Issues](https://github.com/yourusername/cronflow/issues) • [⭐ Star on GitHub](https://github.com/yourusername/cronflow)
+[📚 Full Documentation](README.md) • [🐛 Report Issues](https://github.com/malekandrew/cronflow/issues) • [⭐ Star on GitHub](https://github.com/malekandrew/cronflow)
 
 </div>
 
-[⭐ Star on GitHub](https://github.com/yourusername/cronflow)
+[⭐ Star on GitHub](https://github.com/malekandrew/cronflow)
 
 </div>

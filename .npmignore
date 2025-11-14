@@ -1,0 +1,34 @@
+# .npmignore - Exclude files from npm package
+
+# Test files
+test-*.js
+*.test.js
+vitest.config.js
+coverage/
+.vitest/
+
+# Development files
+.github/
+.vscode/
+
+# Documentation (keep only README.md)
+CONTRIBUTING.md
+QUICK_START.md
+SECURITY.md
+
+# Development artifacts
+.DS_Store
+*.log
+*.tmp
+*.temp
+
+# Source control
+.git
+.gitignore
+.gitattributes
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/

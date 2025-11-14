@@ -1,14 +1,47 @@
 {
-  "name": "project-name",
+  "name": "cronflow",
   "version": "1.0.0",
+  "description": "Master your cron expressions with natural language and real-time feedback. Convert human-readable schedules to cron syntax instantly.",
+  "main": "index.html",
+  "type": "module",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "start": "npx http-server -p 8080",
+    "dev": "npx http-server -p 8080"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malekandrew/cronflow.git"
+  },
+  "keywords": [
+    "cron",
+    "cron-expression",
+    "cron-generator",
+    "scheduler",
+    "natural-language",
+    "nlp",
+    "compromise",
+    "chrono",
+    "cron-parser",
+    "cron-validator",
+    "time-scheduler",
+    "vanilla-javascript",
+    "es6-modules"
+  ],
+  "author": "CronFlow Contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/malekandrew/cronflow/issues"
+  },
+  "homepage": "https://github.com/malekandrew/cronflow#readme",
   "devDependencies": {
     "vitest": "^4.0.8"
   },
   "dependencies": {
     "chrono-node": "^2.9.0",
     "compromise": "^14.14.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

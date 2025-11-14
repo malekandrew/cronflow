@@ -40,12 +40,6 @@ export class NaturalLanguageParser {
                 const cronExpression = this.cronConverter.convert(nlpResult);
                 if (cronExpression) {
                     this.lastParserUsed = 'nlp';
-                    console.log('NLP Parser:', {
-                        input: text,
-                        parsed: nlpResult,
-                        cron: cronExpression,
-                        description: this.nlpEngine.describe(nlpResult)
-                    });
                     return cronExpression;
                 }
             }
@@ -57,10 +51,6 @@ export class NaturalLanguageParser {
         const regexResult = this.parseWithRegex(text);
         if (regexResult) {
             this.lastParserUsed = 'regex';
-            console.log('Regex Parser:', {
-                input: text,
-                cron: regexResult
-            });
             return regexResult;
         }
 
