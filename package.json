@@ -20,13 +20,10 @@
     "scheduler",
     "natural-language",
     "nlp",
-    "compromise",
-    "chrono",
-    "cron-parser",
-    "cron-validator",
-    "time-scheduler",
     "vanilla-javascript",
-    "es6-modules"
+    "es6-modules",
+    "cdn",
+    "no-build"
   ],
   "author": "CronFlow Contributors",
   "license": "MIT",
@@ -36,12 +33,5 @@
   "homepage": "https://github.com/malekandrew/cronflow#readme",
   "devDependencies": {
     "vitest": "^4.0.8"
-  },
-  "dependencies": {
-    "chrono-node": "^2.9.0",
-    "compromise": "^14.14.4"
-  },
-  "engines": {
-    "node": ">=14.0.0"
   }
 }
