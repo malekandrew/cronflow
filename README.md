@@ -7,8 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Made with JavaScript](https://img.shields.io/badge/Made%20with-JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![ES6 Modules](https://img.shields.io/badge/ES6-Modules-green)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://malekandrew.github.io/cronflow/)
 
-[Demo](#-quick-start) • [Features](#-features) • [Architecture](#-architecture) • [Installation](#-installation) • [Documentation](#-documentation)
+**[🚀 Live Demo](https://malekandrew.github.io/cronflow/)** | [Features](#-features) | [Architecture](#-architecture) | [Local Setup](#-local-development) | [Documentation](#-documentation)
 
 ---
 
@@ -29,14 +30,20 @@
 - **📋 Copy to Clipboard**: One-click copy of generated cron expressions
 - **🎨 Modern UI**: Clean, responsive design with smooth animations
 
-## 🚀 Quick Start
+## 🚀 Try It Now
+
+**Live Demo:** [https://malekandrew.github.io/cronflow/](https://malekandrew.github.io/cronflow/)
+
+No installation required! CronFlow uses CDN-hosted dependencies and runs entirely in your browser.
+
+## 💻 Local Development
 
 ### Prerequisites
 
 - A modern web browser (Chrome 61+, Firefox 60+, Safari 11+, or Edge 16+)
-- Node.js (recommended) or Python 3 (for local server)
+- Node.js or Python 3 (for local server)
 
-### Installation
+### Setup
 
 1. **Clone the repository**
    ```bash
@@ -44,20 +51,16 @@
    cd cronflow
    ```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start a local server**
+2. **Start a local server**
    
    Choose one of the following methods:
    
    **Node.js (Recommended):**
    ```bash
+   npm start
+   # or
    npx http-server -p 8080
    ```
-   > No installation needed! `npx` comes with Node.js 5.2+ and runs packages directly.
    
    **Python:**
    ```bash
@@ -69,6 +72,14 @@
    Navigate to [http://localhost:8080](http://localhost:8080)
 
 > **Note:** A web server is required because the application uses ES6 modules, which need HTTP protocol (not `file://`).
+
+### Dependencies
+
+CronFlow uses **CDN-hosted dependencies** (compromise.js and chrono-node) - no `npm install` required! This enables:
+- ✅ Zero-config deployment to any static host
+- ✅ Fast loading via global CDN edge caching
+- ✅ No build step or bundler needed
+- ✅ Pure ES6 modules running directly in browser
 
 ## 📸 Screenshots
 
@@ -446,21 +457,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Built with vanilla JavaScript (no frameworks!)
+- NLP powered by [compromise.js](https://github.com/spencermountain/compromise) and [chrono-node](https://github.com/wanasit/chrono)
+- Dependencies served via [jsDelivr CDN](https://www.jsdelivr.com/)
 - Animated background powered by Canvas API
 - Icons from [Font Awesome](https://fontawesome.com/)
 - Fonts from [Google Fonts](https://fonts.google.com/) (Inter, Orbitron)
-- Created as a GitHub Copilot training project
+- Hosted on [GitHub Pages](https://pages.github.com/)
 
 ## 📧 Contact
 
-For questions or feedback, please open an issue on GitHub.
+For questions or feedback, please [open an issue](https://github.com/malekandrew/cronflow/issues) on GitHub.
 
 ---
 
 <div align="center">
 
-**Made with ❤️ and GitHub Copilot**
+**Made with ❤️ using GitHub Copilot**
 
-⭐ Star this repo if you find it helpful!
+[🌐 Live Demo](https://malekandrew.github.io/cronflow/) • [⭐ Star on GitHub](https://github.com/malekandrew/cronflow) • [🐛 Report Bug](https://github.com/malekandrew/cronflow/issues)
 
 </div>
